@@ -27,6 +27,44 @@ This part will be explained in more details later on.
 # TO BE CONTINUED
 
 ''')
+
+
+st.header("Raw data")
+
+
 df = pd.read_csv("RFM_dataset.csv")
-st.header("Let's look at some random sample values from our users")
-st.dataframe(df.head(10))
+st.markdown('''
+Let's look at some (randomly generated) data with r, f and m values.
+''')
+st.dataframe(df)
+st.markdown('''
+Now the idea is to go from a lot of values, which all together are hard to analyse and compare, to a set of scoring for each user and metric translating how good the value is compared to others.
+This is quite easy to do using pandas buil-in quantile cut function *qcut()* and describes as follows: 
+''')
+st.code('''
+quantiles = [0,.25,.5,.75,1] #define quantiles: here quartiles
+RFM_labels = [1,2,3,4] #define a score for each quantile, where higher is better
+
+#Apply these transformations raw values on the dataframe and save in new R,F,M columns
+df['R'], R_splits = pd.qcut(df['r_value'], q=quantiles, labels=RFM_labels, retbins=True)
+df['F'], F_splits = pd.qcut(df['f_value'], q=quantiles, labels=RFM_labels, retbins=True)
+df['M'], M_splits = pd.qcut(df['m_value'], q=quantiles, labels=RFM_labels, retbins=True)
+''')
+st.markdown('''
+Let's now looks at the newly created R,F,M scoring columns on a few samples:
+''')
+
+quantiles = [0,0.25,0.5,0.75,1] #define quantiles: here quartiles
+RFM_labels = [1,2,3,4] #define a score for each quantile, where higher is better
+
+#Apply these transformations raw values on the dataframe and save in new R,F,M columns
+df['R'], R_splits = pd.qcut(df['r_value'], q=quantiles, labels=RFM_labels, retbins=True)
+df['F'], F_splits = pd.qcut(df['f_value'], q=quantiles, labels=RFM_labels, retbins=True)
+df['M'], M_splits = pd.qcut(df['m_value'], q=quantiles, labels=RFM_labels, retbins=True)
+
+if st.button('Tap me to try'):
+    st.dataframe(df.astype('object'))
+
+
+
+
