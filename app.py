@@ -45,13 +45,13 @@ df = pd.read_csv("RFM_dataset.csv")
 
 st.dataframe(df)
 st.markdown('''
-If we look at the first sample that corresponds to **user_1**, we can see that his **r_value** is equal to 0, which means that he played a content today. His **f_value** is equal to 21 meaning that out of the 28 last days, he played a content on 21 distinct days which is pretty high. Finally, his average play session reaches around 80 minutes, which can be infered as 1 typical length movie or 2 tv series episodes.
+If we look at the first sample that corresponds to **user_0**, we can see that his **r_value** is equal to 0, which means that he played a content today. His **f_value** is equal to 21 meaning that out of the 28 last days, he played a content on 21 distinct days which is pretty high. Finally, his average play session reaches around 80 minutes, which can be infered as 1 typical full-length movie or 2 tv series episodes.
 From these numbers it appears that this user is pretty active as he was connected today and watched very frequently for a good session average time. However, from the raw numbers, it is hard to understand how this user compares with the rest of the user base.
 
 ## RFM scores
 
 Now the idea is to go from a lot of values, which all together are hard to analyse and compare, to a set of scoring for each user and metric translating how good the value is compared to others.
-This is quite easy to do using pandas buil-in quantile cut function *qcut()* and describes as follows: 
+This is quite easy to do using pandas built-in quantile cut function *qcut()* and describes as follows: 
 ''')
 
 with st.echo():
