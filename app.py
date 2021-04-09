@@ -64,7 +64,7 @@ if st.sidebar.button("Reset dataset to demo file"):
     df = pd.read_csv("RFM_dataset.csv")
 
 quantiles = st.sidebar.select_slider(
-    label='Number of quantiles to use for RFM scores', options=[2, 3, 4, 5, 6], value=4)
+    label='Number of quantiles to use for RFM scores', options=[2, 3, 4, 5], value=4)
 
 scores = np.linspace(1, quantiles, quantiles).astype(int)
 df['m_value'] = df['m_value'].apply(lambda x: int(x*60))
@@ -137,10 +137,12 @@ Earlier, we talked about the importance of segments explainability. Because a st
 Let's display the actual threshold values to which each score corresponds in our use case: 
 '''
 
+
 @st.cache()
 def compute_RFM_splits(R_splits, F_splits, M_splits):
     return pd.DataFrame([R_splits[:-1], F_splits[:-1],
                          M_splits[:-1]], index=['R', 'F', 'M'], columns=scores)
+
 
 st.dataframe(compute_RFM_splits(R_splits, F_splits, M_splits))
 
