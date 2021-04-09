@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 st.title("A quick yet powerful user segmentation using RFM", )
 st.image('The-Key-to-Successful-Segmentations.jpg')
@@ -9,6 +10,8 @@ st.markdown('''
 Customer segmentation is at the core of a lot of nowadays businesses as it is crucial to understand how users interact with a given service, and identify tomorrow's churners and high value customers.
 There are endless ways to segment a service user base, but most techniques act as a black box and are hard to understand or explain.
 The purpose of this post is to present you an **easy** and **yet powerful** way to segment users regarding their level of interaction and value towards content.
+
+This article is a quick overview of the concept and applications. If you'd wish to learn more: reach me out on [LinkedIn](https://www.linkedin.com/in/baptistebelescot/) as I might write a far more detailed and documented article about RFM documentation on Medium in the near future.
 ''')
 st.markdown('''
 
@@ -42,14 +45,26 @@ Let's suppose we are a big streaming platform and have thousands of users. Let's
 Let's directly dive in by looking at some randomly generated R,F,M values for users of a streaming platform on the last 28 days:
 ''')
 
-st.sidebar.title("Parameters: ")
+st.sidebar.title("Who am I? ")
+st.sidebar.markdown('''
+Hi, my name is Baptiste and I'm a Data Scientist with 2-3 years of experience.
+
+I have experience working in media and (biomedical) research.
+
+If you have any question or spot a bug (this whole page is still in *beta* and more features will be added in the future), do not hesitate to reach me out on [LinkedIn](https://www.linkedin.com/in/baptistebelescot/).
+
+Code of this webapp and datasets are available on my [GitHub](https://github.com/bbelescot/streaming_RFM_segmentation).
+
+## Optional parameters
+Read the whole post first and then come back here to play with parameters :)
+''')
 
 df = pd.read_csv("RFM_dataset.csv")
 
 if st.sidebar.button("Reset dataset to demo file"):
     df = pd.read_csv("RFM_dataset.csv")
 
-quantiles = st.sidebar.select_slider(label='# of quantiles to use for RFM score', options=[2,3,4,5,6], value=4)
+quantiles = st.sidebar.select_slider(label='Number of quantiles to use for RFM scores', options=[2,3,4,5,6], value=4)
 
 scores = np.linspace(1,quantiles, quantiles).astype(int)
 df['m_value'] = df['m_value'].apply(lambda x: int(x*60))
@@ -108,25 +123,25 @@ st.dataframe(pd.DataFrame([R_splits[:-1], F_splits[:-1], M_splits[:-1]], index=[
 st.markdown('''
 Based on these thresholds, it is now easy to understand the type of frequency a user should meet to be part of our best or second best cluster, or the number of days after which, users fall into the lowest recency group that if confronted with churn rate leads to a X times more chance of churn.
 
-## Now it's time to you to try on your own data
+## Now it's time to try on your own data!
 
-Define the R,F,M definitions that fit your problem (time window, action to be tracked, ...), compute the raw values using basic Python scripts or SQL, prepare a cvs file that meets ReadMe expectations (consult on GitHub) and charge it below to compute RFM scores and classes! 
+Define the R,F,M definitions that fit your problem (time window, action to be tracked, ...), compute the raw values using basic Python scripts or SQL, prepare a cvs file that meets ReadMe expectations (consult on [GitHub](https://github.com/bbelescot/streaming_RFM_segmentation)) and charge it below to compute RFM scores and classes! 
 ''')
 
-uploaded_file = st.file_uploader("Upload your own RFM value csv")
+uploaded_file = st.file_uploader("Upload your own RFM value csv that respect guidelines")
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)[['r_value','f_value','m_value']]
+    df_p = pd.read_csv(uploaded_file)[['r_value','f_value','m_value']]
     '''### Dataset'''
-    st.dataframe(df)
-    df['R'], R_splits = pd.qcut(df['r_value'], q=quantiles, labels=scores, retbins=True)
-    df['F'], F_splits = pd.qcut(df['f_value'], q=quantiles, labels=scores, retbins=True)
-    df['M'], M_splits = pd.qcut(df['m_value'], q=quantiles, labels=scores, retbins=True)
-    df['RFM_score'] = df.apply(lambda row: row.R + row.F + row.M, axis=1)
-    df['RFM_class'] = df.apply(lambda row: str(int(row.R)) + str(int(row.F)) + str(int(row.M)), axis=1)
+    st.dataframe(df_p.astype('object'))
+    df_p['R'], R_splits_p = pd.qcut(df_p['r_value'], q=quantiles, labels=scores, retbins=True)
+    df_p['F'], F_splits_p = pd.qcut(df_p['f_value'], q=quantiles, labels=scores, retbins=True)
+    df_p['M'], M_splits_p = pd.qcut(df_p['m_value'], q=quantiles, labels=scores, retbins=True)
+    df_p['RFM_score'] = df_p.apply(lambda row: row.R + row.F + row.M, axis=1)
+    df_p['RFM_class'] = df_p.apply(lambda row: str(int(row.R)) + str(int(row.F)) + str(int(row.M)), axis=1)
     '''### RFM scores and classes'''
-    st.dataframe(df.astype('object'))
+    st.dataframe(df_p.astype('object'))
     '''### RFM thresholds'''
-    st.dataframe(pd.DataFrame([R_splits[:-1], F_splits[:-1], M_splits[:-1]], index=['R','F','M'], columns=scores))
+    st.dataframe(pd.DataFrame([R_splits_p[:-1], F_splits_p[:-1], M_splits_p[:-1]], index=['R','F','M'], columns=scores))
 
 
    
