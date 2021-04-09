@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 st.title("A quick yet powerful user segmentation using RFM", )
 st.image('The-Key-to-Successful-Segmentations.jpg')
+
 '''
 # Introduction
 Customer segmentation is at the core of a lot of nowadays businesses as it is crucial to understand how users interact with a given service, and identify tomorrow's churners and high value customers.
@@ -12,8 +13,6 @@ There are endless ways to segment a service user base, but most techniques act a
 The purpose of this post is to present you an **easy** and **yet powerful** way to segment users regarding their level of interaction and value towards content.
 
 This article is a quick overview of the concept and applications. If you'd wish to learn more: reach me out on [LinkedIn](https://www.linkedin.com/in/baptistebelescot/) as I might write a far more detailed and documented article about RFM documentation on Medium in the near future.
-'''
-'''
 
 ## RFM segmentation
 RFM segmentation is based on three indicators, described as follows:
@@ -64,9 +63,10 @@ df = pd.read_csv("RFM_dataset.csv")
 if st.sidebar.button("Reset dataset to demo file"):
     df = pd.read_csv("RFM_dataset.csv")
 
-quantiles = st.sidebar.select_slider(label='Number of quantiles to use for RFM scores', options=[2,3,4,5,6], value=4)
+quantiles = st.sidebar.select_slider(
+    label='Number of quantiles to use for RFM scores', options=[2, 3, 4, 5], value=4)
 
-scores = np.linspace(1,quantiles, quantiles).astype(int)
+scores = np.linspace(1, quantiles, quantiles).astype(int)
 df['m_value'] = df['m_value'].apply(lambda x: int(x*60))
 
 st.dataframe(df)
@@ -82,19 +82,26 @@ This is quite easy to do using pandas built-in quantile cut function *qcut()* an
 '''
 
 with st.echo():
-    #Apply these transformations raw values on the dataframe and save in new R,F,M columns
-    df['R'], R_splits = pd.qcut(df['r_value'], q=quantiles, labels=scores, retbins=True)
-    df['F'], F_splits = pd.qcut(df['f_value'], q=quantiles, labels=scores, retbins=True)
-    df['M'], M_splits = pd.qcut(df['m_value'], q=quantiles, labels=scores, retbins=True)
-    df['RFM_score'] = df.apply(lambda row: row.R + row.F + row.M, axis=1)
-    df['RFM_class'] = df.apply(lambda row: str(int(row.R)) + str(int(row.F)) + str(int(row.M)), axis=1)
-
+    @st.cache()
+    def compute_RFM(df, quantiles, scores):
+        df['R'], R_splits = pd.qcut(
+            df['r_value'], q=quantiles, labels=scores, retbins=True)
+        df['F'], F_splits = pd.qcut(
+            df['f_value'], q=quantiles, labels=scores, retbins=True)
+        df['M'], M_splits = pd.qcut(
+            df['m_value'], q=quantiles, labels=scores, retbins=True)
+        df['RFM_score'] = df.apply(lambda row: row.R + row.F + row.M, axis=1)
+        df['RFM_class'] = df.apply(lambda row: str(
+            int(row.R)) + str(int(row.F)) + str(int(row.M)), axis=1)
+        return df, R_splits, F_splits, M_splits
 
 '''
 Let's now look at the newly created R,F,M scoring columns on a few samples and see which score was awarded to each user and metric:
+### RFM scores
 '''
 
-st.dataframe(df.astype('object').sample(5))
+df_RFM, R_splits, F_splits, M_splits = compute_RFM(df, quantiles, scores)
+st.dataframe(df_RFM.astype('object').sample(5))
 
 '''
 We now have for each line, i.e each user, a comprehensive scoring for recency, frenquency and measurement with 1 being the lowest score and the number of quantiles the highest. 
@@ -102,20 +109,21 @@ With this view it is easy to analyse the user behaviour and track his **strength
 
 The compound RFM_score gives an overall view, the higher the better and more balanced and versatile the user is towards our tracking and performance metrics.'''
 
-fig, ax = plt.subplots(figsize=(10,4))
+fig, ax = plt.subplots(figsize=(10, 4))
 ax.set_xlabel('RFM_score')
 ax.set_ylabel('Number of users')
-df['RFM_score'].value_counts().sort_index().plot(kind='bar', ax=ax, title='Number of users per RFM_score')
+df_RFM['RFM_score'].value_counts().sort_index().plot(
+    kind='bar', ax=ax, title='Number of users per RFM_score')
 st.pyplot(fig)
-
 
 '''Finally a RFM_class is awarded. It can be used for clustering (note that in the case of a lot of quantiles there will be *quantiles x quantiles x quantiles* classes, it is hence necessary to 
 gather similar classes together to reduce dimensions or to compare these classes with another metric, such as churn rate, to find similar clusters). '''
 
-fig2, ax2 = plt.subplots(figsize=(20,5))
+fig2, ax2 = plt.subplots(figsize=(15, 5))
 ax2.set_xlabel('RFM_class')
 ax2.set_ylabel('Number of users')
-df['RFM_class'].value_counts().sort_index().plot(kind='bar', ax=ax2, title='Number of users per RFM_class')
+df_RFM['RFM_class'].value_counts().sort_index().plot(
+    kind='bar', ax=ax2, title='Number of users per RFM_class')
 st.pyplot(fig2)
 
 '''In the case of 4 quantiles, the best cluster will be the 444, corresponding to people that consumed content recently, on a frenquent basis and with a lot of interest (long sessions). But other segments
@@ -124,14 +132,19 @@ users that might churn and for which we should act fast not to loose them! Anoth
 struggling finding the content they like?
 
 These are the kind of questions you should ask yourself, for each of the clusters. The main idea being: let's have a product/marketing action targeted for each cluster!
-'''
 
-'''
 Earlier, we talked about the importance of segments explainability. Because a statistical method was applied it is possible to look at threshold conditions that led to metrics scores (1,2, ...).
 Let's display the actual threshold values to which each score corresponds in our use case: 
 '''
 
-st.dataframe(pd.DataFrame([R_splits[:-1], F_splits[:-1], M_splits[:-1]], index=['R','F','M'], columns=scores))
+
+@st.cache()
+def compute_RFM_splits(R_splits, F_splits, M_splits):
+    return pd.DataFrame([R_splits[:-1], F_splits[:-1],
+                         M_splits[:-1]], index=['R', 'F', 'M'], columns=scores)
+
+
+st.dataframe(compute_RFM_splits(R_splits, F_splits, M_splits))
 
 '''
 Based on these thresholds, it is now easy to understand the type of frequency a user should meet to be part of our best or second best cluster, or the number of days after which, users fall into the lowest recency group that if confronted with churn rate leads to a X times more chance of churn.
@@ -141,25 +154,13 @@ Based on these thresholds, it is now easy to understand the type of frequency a 
 Define the R,F,M definitions that fit your problem (time window, action to be tracked, ...), compute the raw values using basic Python scripts or SQL, prepare a csv file that meets ReadMe expectations (consult on [GitHub](https://github.com/bbelescot/streaming_RFM_segmentation)) and charge it below to compute RFM scores and classes! 
 '''
 
-uploaded_file = st.file_uploader("Upload your own RFM value csv that respect guidelines")
+uploaded_file = st.file_uploader(
+    "Upload your own RFM value csv that respect guidelines")
 if uploaded_file is not None:
-    df_p = pd.read_csv(uploaded_file)[['r_value','f_value','m_value']]
-    '''### Dataset'''
-    st.dataframe(df_p.astype('object'))
-    df_p['R'], R_splits_p = pd.qcut(df_p['r_value'], q=quantiles, labels=scores, retbins=True)
-    df_p['F'], F_splits_p = pd.qcut(df_p['f_value'], q=quantiles, labels=scores, retbins=True)
-    df_p['M'], M_splits_p = pd.qcut(df_p['m_value'], q=quantiles, labels=scores, retbins=True)
-    df_p['RFM_score'] = df_p.apply(lambda row: row.R + row.F + row.M, axis=1)
-    df_p['RFM_class'] = df_p.apply(lambda row: str(int(row.R)) + str(int(row.F)) + str(int(row.M)), axis=1)
-    '''### RFM scores and classes'''
-    st.dataframe(df_p.astype('object'))
+    dfp = pd.read_csv(uploaded_file)[['r_value', 'f_value', 'm_value']]
+    '''### RFM scores'''
+    dfp_RFM, Rp_splits, Fp_splits, Mp_splits = compute_RFM(
+        dfp, quantiles, scores)
+    st.dataframe(dfp_RFM.astype('object'))
     '''### RFM thresholds'''
-    st.dataframe(pd.DataFrame([R_splits_p[:-1], F_splits_p[:-1], M_splits_p[:-1]], index=['R','F','M'], columns=scores))
-
-
-   
-
-
-
-
-
+    st.dataframe(compute_RFM_splits(Rp_splits, Fp_splits, Mp_splits))
