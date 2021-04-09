@@ -125,7 +125,7 @@ Based on these thresholds, it is now easy to understand the type of frequency a 
 
 ## Now it's time to try on your own data!
 
-Define the R,F,M definitions that fit your problem (time window, action to be tracked, ...), compute the raw values using basic Python scripts or SQL, prepare a cvs file that meets ReadMe expectations (consult on [GitHub](https://github.com/bbelescot/streaming_RFM_segmentation)) and charge it below to compute RFM scores and classes! 
+Define the R,F,M definitions that fit your problem (time window, action to be tracked, ...), compute the raw values using basic Python scripts or SQL, prepare a csv file that meets ReadMe expectations (consult on [GitHub](https://github.com/bbelescot/streaming_RFM_segmentation)) and charge it below to compute RFM scores and classes! 
 ''')
 
 uploaded_file = st.file_uploader("Upload your own RFM value csv that respect guidelines")
