@@ -5,15 +5,15 @@ import matplotlib.pyplot as plt
 
 st.title("A quick yet powerful user segmentation using RFM", )
 st.image('The-Key-to-Successful-Segmentations.jpg')
-st.markdown('''
+'''
 # Introduction
 Customer segmentation is at the core of a lot of nowadays businesses as it is crucial to understand how users interact with a given service, and identify tomorrow's churners and high value customers.
 There are endless ways to segment a service user base, but most techniques act as a black box and are hard to understand or explain.
 The purpose of this post is to present you an **easy** and **yet powerful** way to segment users regarding their level of interaction and value towards content.
 
 This article is a quick overview of the concept and applications. If you'd wish to learn more: reach me out on [LinkedIn](https://www.linkedin.com/in/baptistebelescot/) as I might write a far more detailed and documented article about RFM documentation on Medium in the near future.
-''')
-st.markdown('''
+'''
+'''
 
 ## RFM segmentation
 RFM segmentation is based on three indicators, described as follows:
@@ -43,7 +43,7 @@ Let's suppose we are a big streaming platform and have thousands of users. Let's
 
 ## Raw data
 Let's directly dive in by looking at some randomly generated R,F,M values for users of a streaming platform on the last 28 days:
-''')
+'''
 
 st.sidebar.title("Who am I? ")
 st.sidebar.markdown('''
@@ -70,7 +70,7 @@ scores = np.linspace(1,quantiles, quantiles).astype(int)
 df['m_value'] = df['m_value'].apply(lambda x: int(x*60))
 
 st.dataframe(df)
-st.markdown('''
+'''
 If we look at the sample **0**, we can see that his **r_value** is equal to 0, which means that he played a content today. His **f_value** is equal to 21 meaning that out of the 28 last days, he played a content on 21 distinct days which is pretty high. Finally, his average play session reaches around 80 minutes, which can be infered as 1 typical full-length movie or 2 tv series episodes.
 
 From these numbers it appears that this user is pretty active as he was connected today and watched very frequently for a good session average time. However, from the raw numbers, it is hard to understand how this user compares with the rest of the user base.
@@ -79,7 +79,7 @@ From these numbers it appears that this user is pretty active as he was connecte
 
 Now the idea is to go from a lot of values, which all together are hard to analyse and compare, to a set of scoring for each user and metric translating how good the value is compared to others.
 This is quite easy to do using pandas built-in quantile cut function *qcut()* and describes as follows: 
-''')
+'''
 
 with st.echo():
     #Apply these transformations raw values on the dataframe and save in new R,F,M columns
@@ -90,43 +90,56 @@ with st.echo():
     df['RFM_class'] = df.apply(lambda row: str(int(row.R)) + str(int(row.F)) + str(int(row.M)), axis=1)
 
 
-st.markdown('''
+'''
 Let's now look at the newly created R,F,M scoring columns on a few samples and see which score was awarded to each user and metric:
-''')
+'''
 
 st.dataframe(df.astype('object').sample(5))
 
-st.markdown('''
+'''
 We now have for each line, i.e each user, a comprehensive scoring for recency, frenquency and measurement with 1 being the lowest score and the number of quantiles the highest. 
 With this view it is easy to analyse the user behaviour and track his **strengths** and **weaknesses** by looking at individual R, F and M scores. 
 
-The compound RFM_score gives an overall view, the higher the better and more balanced and versatile the user is towards our tracking and performance metrics.
+The compound RFM_score gives an overall view, the higher the better and more balanced and versatile the user is towards our tracking and performance metrics.'''
 
-Finally a RFM_class is awarded. It can be used for clustering (note that in the case of a lot of quantiles there will be *quantiles x quantiles x quantiles* classes, it is hence necessary to 
-gather similar classes together to reduce dimensions or to compare these classes with another metric, such as churn rate, to find similar clusters). 
+fig, ax = plt.subplots(figsize=(10,4))
+ax.set_xlabel('RFM_score')
+ax.set_ylabel('Number of users')
+df['RFM_score'].value_counts().sort_index().plot(kind='bar', ax=ax, title='Number of users per RFM_score')
+st.pyplot(fig)
 
-In the case of 4 quantiles, the best cluster will be the 444, corresponding to people that consumed content recently, on a frenquent basis and with a lot of interest (long sessions). But other segments
+
+'''Finally a RFM_class is awarded. It can be used for clustering (note that in the case of a lot of quantiles there will be *quantiles x quantiles x quantiles* classes, it is hence necessary to 
+gather similar classes together to reduce dimensions or to compare these classes with another metric, such as churn rate, to find similar clusters). '''
+
+fig2, ax2 = plt.subplots(figsize=(20,5))
+ax2.set_xlabel('RFM_class')
+ax2.set_ylabel('Number of users')
+df['RFM_class'].value_counts().sort_index().plot(kind='bar', ax=ax2, title='Number of users per RFM_class')
+st.pyplot(fig2)
+
+'''In the case of 4 quantiles, the best cluster will be the 444, corresponding to people that consumed content recently, on a frenquent basis and with a lot of interest (long sessions). But other segments
 are also intersting, if we look at the 144 for instance, it corresponds to people who had a high frequency and interest in the service but didn't connect for quite a long time: these are very valuable 
 users that might churn and for which we should act fast not to loose them! Another intersting cluster would be the 441 corresponding to frequent and recent users but that don't usually stay long to consume content: are they 
 struggling finding the content they like?
 
-These are the kind of questions you should ask yourself, for each of the cluster. The main idea being: let's have a product/marketing action targeted for each cluster!
-''')
+These are the kind of questions you should ask yourself, for each of the clusters. The main idea being: let's have a product/marketing action targeted for each cluster!
+'''
 
-st.markdown('''
+'''
 Earlier, we talked about the importance of segments explainability. Because a statistical method was applied it is possible to look at threshold conditions that led to metrics scores (1,2, ...).
 Let's display the actual threshold values to which each score corresponds in our use case: 
-''')
+'''
 
 st.dataframe(pd.DataFrame([R_splits[:-1], F_splits[:-1], M_splits[:-1]], index=['R','F','M'], columns=scores))
 
-st.markdown('''
+'''
 Based on these thresholds, it is now easy to understand the type of frequency a user should meet to be part of our best or second best cluster, or the number of days after which, users fall into the lowest recency group that if confronted with churn rate leads to a X times more chance of churn.
 
 ## Now it's time to try on your own data!
 
 Define the R,F,M definitions that fit your problem (time window, action to be tracked, ...), compute the raw values using basic Python scripts or SQL, prepare a csv file that meets ReadMe expectations (consult on [GitHub](https://github.com/bbelescot/streaming_RFM_segmentation)) and charge it below to compute RFM scores and classes! 
-''')
+'''
 
 uploaded_file = st.file_uploader("Upload your own RFM value csv that respect guidelines")
 if uploaded_file is not None:
