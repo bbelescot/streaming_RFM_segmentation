@@ -1,6 +1,6 @@
 # streaming_RFM_segmentation
 
-**Visit the web app directly at this address: https://share.streamlit.io/bbelescot/streaming_rfm_segmentation/main/app.py **
+Visit the web app directly at this address: https://share.streamlit.io/bbelescot/streaming_rfm_segmentation/main/app.py
 
 To try RFM segmentation on your own data, please make a .csv file respecting these rules and upload the file in the last section of the [web app](https://share.streamlit.io/bbelescot/streaming_rfm_segmentation/main/app.py):
 - headers should be the followings: `r_value, f_value, m_value'
