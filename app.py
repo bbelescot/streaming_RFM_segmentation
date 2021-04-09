@@ -71,7 +71,7 @@ df['m_value'] = df['m_value'].apply(lambda x: int(x*60))
 
 st.dataframe(df)
 '''
-If we look at the sample **0**, we can see that his **r_value** is equal to 0, which means that he played a content today. His **f_value** is equal to 21 meaning that out of the 28 last days, he played a content on 21 distinct days which is pretty high. Finally, his average play session reaches around 80 minutes, which can be infered as 1 typical full-length movie or 2 tv series episodes.
+If we look at the sample **0**, we can see that his *r_value* is equal to 0, which means that he played a content today. His *f_value* is equal to 21 meaning that out of the 28 last days, he played a content on 21 distinct days which is pretty high. Finally, his average play session reaches around 80 minutes, which can be infered as 1 typical full-length movie or 2 tv series episodes.
 
 From these numbers it appears that this user is pretty active as he was connected today and watched very frequently for a good session average time. However, from the raw numbers, it is hard to understand how this user compares with the rest of the user base.
 
