@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 st.title("A quick yet powerful user segmentation using RFM", )
-st.image('The-Key-to-Successful-Segmentations.jpg')
 
 '''
 # Introduction
