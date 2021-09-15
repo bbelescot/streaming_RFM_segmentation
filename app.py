@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-st.title("A quick yet powerful user segmentation using RFM", )
+st.title("A quick yet powerful user segmentation using RFM" )
 
 '''
+
 # Introduction
 Customer segmentation is at the core of a lot of nowadays businesses as it is crucial to understand how users interact with a given service, and identify tomorrow's churners and high value customers.
 There are endless ways to segment a service user base, but most techniques act as a black box and are hard to understand or explain.
